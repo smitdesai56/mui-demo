@@ -1,0 +1,24 @@
+.dashboardContainer {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 0;
+}
+
+.userForm {
+    background: white;
+    border-radius: 0.75rem;
+    width: 31.25rem;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 2rem;
+    h3 {
+        margin-bottom: 0.5rem;
+        font-weight: 400;
+        font-size: 1.5rem;
+        line-height: 1.334;
+        text-align: center;
+    }
+    :global(.MuiAvatar-root) {
+        margin: auto;
+        margin-bottom: 1rem;
+    }
+}
