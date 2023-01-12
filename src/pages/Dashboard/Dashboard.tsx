@@ -16,11 +16,12 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "./styles.module.scss";
 
-interface userFields {
+export interface userFields {
   firstName: string;
   lastName: string;
   dob: string;
@@ -61,12 +62,15 @@ export const Dashboard = () => {
     getValues,
   } = useForm<userFields>({ resolver: yupResolver(schema) });
   const values = getValues();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const onSubmitHandler = (data: userFields) => {
     //Make API call
     console.log(data);
-    reset();
     setOpen(true);
+    localStorage.setItem("user", JSON.stringify(data));
+    navigate("/show");
+    reset();
   };
   return (
     <div className={styles.dashboardContainer}>
