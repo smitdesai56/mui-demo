@@ -9,6 +9,7 @@ import {
   Alert,
   Collapse,
   IconButton,
+  Typography,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -20,6 +21,10 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "./styles.module.scss";
+import { uploadFile } from "react-s3";
+import { Buffer } from "buffer";
+
+window.Buffer = window.Buffer || Buffer;
 
 export interface userFields {
   firstName: string;
@@ -34,6 +39,13 @@ export interface userFields {
     country: string;
   };
 }
+
+const config = {
+  bucketName: process.env.REACT_APP_BUCKET_NAME,
+  region: process.env.REACT_APP_REGION,
+  accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
+  secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
+};
 
 export const Dashboard = () => {
   const schema = Yup.object().shape({
@@ -64,13 +76,24 @@ export const Dashboard = () => {
   const values = getValues();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const onSubmitHandler = (data: userFields) => {
+  const [selectedFile, setSelectedFile] = useState<File>();
+  const onSubmitHandler = async (data: userFields) => {
     //Make API call
     console.log(data);
+    let file = {};
+    if (selectedFile) {
+      await uploadFile(selectedFile, config)
+        .then((data) => (file = data))
+        .catch((err) => console.error("err", err));
+    }
+    localStorage.setItem("user", JSON.stringify({ ...data, file }));
     setOpen(true);
-    localStorage.setItem("user", JSON.stringify(data));
     navigate("/show");
     reset();
+  };
+
+  const onFileChange = (e: any) => {
+    setSelectedFile(e?.target?.files[0]);
   };
   return (
     <div className={styles.dashboardContainer}>
@@ -197,6 +220,15 @@ export const Dashboard = () => {
                 multiline
                 {...register("address.country")}
               />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Button variant="contained" component="label">
+                Select File
+                <input type="file" hidden onChange={(e) => onFileChange(e)} />
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={5} margin={"auto 0"}>
+              <Typography component={"p"}>{selectedFile?.name}</Typography>
             </Grid>
           </Grid>
           <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>

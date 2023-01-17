@@ -14,8 +14,19 @@ import { useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import styles from "./styles.module.scss";
 
+interface UploadResponse {
+  bucket: string;
+  key: string;
+  location: string;
+  response: any;
+}
+
+interface UserDetails extends userFields {
+  file: UploadResponse;
+}
+
 export const ShowUser = () => {
-  const [userDetails, setUserDetails] = useState<userFields>();
+  const [userDetails, setUserDetails] = useState<UserDetails>();
   const navigate = useNavigate();
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -58,6 +69,18 @@ export const ShowUser = () => {
                 ) : (
                   <TableCell></TableCell>
                 )}
+              </TableRow>
+              <TableRow>
+                <TableCell>Attachment</TableCell>
+                <TableCell>
+                  <a
+                    href={`${userDetails?.file?.location}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {userDetails?.file?.key}
+                  </a>
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
